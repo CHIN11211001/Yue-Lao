@@ -1,7 +1,6 @@
 import React from 'react';
 import { useFilterStore } from '../../store/useFilterStore';
 import type {
-  Gender,
   AgeRange,
   HeightRange,
   WeightRange,
