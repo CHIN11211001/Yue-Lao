@@ -9,8 +9,15 @@ export const ResultSummary: React.FC = () => {
   const result = useFilterStore((s) => s.result);
 
   const pct = result.finalPercentage * 100;
-  const pctStr =
-    pct >= 1 ? pct.toFixed(1) : pct >= 0.01 ? pct.toFixed(3) : pct.toExponential(2);
+  let pctStr = '0';
+  if (pct >= 1) {
+    pctStr = pct.toFixed(1);
+  } else if (pct >= 0.01) {
+    pctStr = pct.toFixed(3);
+  } else if (pct > 0) {
+    pctStr = pct.toFixed(6).replace(/0+$/, '').replace(/\.$/, '');
+    if (pctStr === '0') pctStr = '< 0.000001';
+  }
 
   const popStr = result.estimatedPopulation.toLocaleString('zh-TW');
   const desc = probabilityToDescription(result.finalPercentage);
