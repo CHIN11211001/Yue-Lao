@@ -201,6 +201,10 @@ export const FilterPanel: React.FC = () => {
 
       <MyConditionsSection />
 
+      <div className="filter-panel__global-hint">
+        *不選表示包含全部條件
+      </div>
+
       <ChipGroup<AgeRange>
         title="年齡區間"
         icon="🎂"
@@ -210,7 +214,6 @@ export const FilterPanel: React.FC = () => {
         onSetAll={(vals) => store.setField('ageRanges', vals)}
         percentage={store.result.dimensionPercentages.age}
         sectionId="filter-age"
-        hint="*不選表示包含全部條件"
       />
 
       <ChipGroup<HeightRange>
