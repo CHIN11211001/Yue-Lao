@@ -38,7 +38,7 @@ export const ResultSummary: React.FC = () => {
         <div className="result-card__value result-card__value--gold">
           {popStr}
         </div>
-        <div className="result-card__subtitle">人（全台成年人口）</div>
+        <div className="result-card__subtitle">人（全台預估人數）</div>
       </div>
 
       <div className="glass-card result-card" id="result-card-ratio">

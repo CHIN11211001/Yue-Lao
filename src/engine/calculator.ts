@@ -99,8 +99,8 @@ export function calculateAnalysis(criteria: FilterCriteria): AnalysisResult {
   );
 
   // 聯合機率（假設各維度獨立）
+  // 排除性別機率，將符合條件的比例基準放在「單一目標性別」之內
   const allProbs = [
-    genderProb,
     ageProb,
     heightProb,
     weightProb,
@@ -113,14 +113,24 @@ export function calculateAnalysis(criteria: FilterCriteria): AnalysisResult {
     industryProb,
   ];
   const finalPercentage = calculateJointProbability(allProbs);
-  const estimatedPopulation = Math.round(finalPercentage * ADULT_POPULATION);
+  
+  // 目標性別的總人口
+  const targetGenderPopulation = genderProb * ADULT_POPULATION;
+  const estimatedPopulation = Math.round(finalPercentage * targetGenderPopulation);
 
   // 漏斗圖步驟（逐步累積篩選）
   const funnelSteps: FunnelStep[] = [];
+  
+  // 將目標性別設立為100%基準點
+  funnelSteps.push({
+    label: `目標性別`,
+    percentage: 1,
+    population: Math.round(targetGenderPopulation),
+  });
+
   let cumulative = 1;
 
   const steps: { label: string; prob: number }[] = [
-    { label: '目標性別', prob: genderProb },
     { label: '年齡條件', prob: ageProb },
     { label: '身高條件', prob: heightProb },
     { label: '體重條件', prob: weightProb },
@@ -138,7 +148,7 @@ export function calculateAnalysis(criteria: FilterCriteria): AnalysisResult {
     funnelSteps.push({
       label: step.label,
       percentage: cumulative,
-      population: Math.round(cumulative * ADULT_POPULATION),
+      population: Math.round(cumulative * targetGenderPopulation),
     });
   }
 
