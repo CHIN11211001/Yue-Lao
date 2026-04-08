@@ -30,13 +30,11 @@ export type HeightRange =
 /** 體重區間 */
 export type WeightRange = 
   | '<45kg' 
-  | '<55kg'
   | '45-55kg' 
   | '55-65kg' 
   | '65-75kg' 
   | '75-85kg' 
   | '85-95kg' 
-  | '85kg+'
   | '95kg+';
 
 /** 星座 */
@@ -152,13 +150,11 @@ export const HEIGHT_LABELS: Record<HeightRange, string> = {
 
 export const WEIGHT_LABELS: Record<WeightRange, string> = {
   '<45kg': '45 以下',
-  '<55kg': '55 以下',
   '45-55kg': '45-55kg',
   '55-65kg': '55-65kg',
   '65-75kg': '65-75kg',
   '75-85kg': '75-85kg',
   '85-95kg': '85-95kg',
-  '85kg+': '85 以上',
   '95kg+': '95 以上',
 };
 

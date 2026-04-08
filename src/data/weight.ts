@@ -9,7 +9,8 @@ import type { WeightRange, GenderedDistribution } from '../engine/types';
  */
 export const WEIGHT_DISTRIBUTION: GenderedDistribution<WeightRange> = {
   male: {
-    '<55kg': 0.05,
+    '<45kg': 0.01,
+    '45-55kg': 0.04,
     '55-65kg': 0.25,
     '65-75kg': 0.35,  // 眾數區間
     '75-85kg': 0.22,
@@ -22,6 +23,7 @@ export const WEIGHT_DISTRIBUTION: GenderedDistribution<WeightRange> = {
     '55-65kg': 0.28,
     '65-75kg': 0.14,
     '75-85kg': 0.05,
-    '85kg+': 0.03,
+    '85-95kg': 0.02,
+    '95kg+': 0.01,
   },
 };
