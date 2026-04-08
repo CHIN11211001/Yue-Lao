@@ -17,7 +17,6 @@ import {
   WEIGHT_DISTRIBUTION,
   EDUCATION_DISTRIBUTION,
   INCOME_DISTRIBUTION,
-  MARRIAGE_DISTRIBUTION,
   AGE_MARRIAGE_DISTRIBUTION,
   REGION_DISTRIBUTION,
   ZODIAC_DISTRIBUTION,
@@ -29,7 +28,6 @@ import {
 import {
   sumSelectedProbability,
   calculateJointProbability,
-  sumSelectedFromCrossMatrix,
   calculateMarriageProbWeightedByAge,
 } from './probability';
 
