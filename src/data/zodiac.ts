@@ -11,10 +11,10 @@ import type { Zodiac, Distribution } from '../engine/types';
 const avg = 1 / 12;
 
 export const ZODIAC_DISTRIBUTION: Distribution<Zodiac> = {
-  aries: avg,
+  aries: avg - 0.005,       // 春季略少
   taurus: avg,
   gemini: avg,
-  cancer: avg + 0.005, // 夏秋交際微高
+  cancer: avg + 0.005,      // 夏秋交際微高
   leo: avg + 0.005,
   virgo: avg + 0.005,
   libra: avg + 0.005,

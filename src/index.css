@@ -336,6 +336,24 @@ body {
   align-items: center;
   gap: var(--space-sm);
   margin-bottom: var(--space-md);
+  position: relative;
+}
+
+.filter-section__title-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.filter-section__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.filter-section__hint--inline {
+  margin-top: 2px;
+  line-height: 1.2;
 }
 
 .filter-section__icon {

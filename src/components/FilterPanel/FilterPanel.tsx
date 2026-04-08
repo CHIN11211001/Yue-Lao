@@ -126,6 +126,7 @@ interface ChipGroupProps<T extends string> {
   onSetAll?: (values: T[]) => void;
   percentage: number;
   sectionId: string;
+  hint?: string;
 }
 
 function ChipGroup<T extends string>({
@@ -137,6 +138,7 @@ function ChipGroup<T extends string>({
   onSetAll,
   percentage,
   sectionId,
+  hint,
 }: ChipGroupProps<T>) {
   const keys = Object.keys(labels) as T[];
   const showPercent = selected.length > 0;
@@ -153,7 +155,10 @@ function ChipGroup<T extends string>({
     <div className="filter-section" id={sectionId}>
       <div className="filter-section__header">
         <span className="filter-section__icon">{icon}</span>
-        <span className="filter-section__title">{title}</span>
+        <div className="filter-section__title-container">
+          <span className="filter-section__title">{title}</span>
+          {hint && <span className="filter-section__hint filter-section__hint--inline">{hint}</span>}
+        </div>
         
         {onSetAll && (
           <div className="filter-section__quick-actions">
@@ -205,6 +210,7 @@ export const FilterPanel: React.FC = () => {
         onSetAll={(vals) => store.setField('ageRanges', vals)}
         percentage={store.result.dimensionPercentages.age}
         sectionId="filter-age"
+        hint="*不選表示包含全部條件"
       />
 
       <ChipGroup<HeightRange>
