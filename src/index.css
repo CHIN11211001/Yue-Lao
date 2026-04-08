@@ -526,6 +526,7 @@ body {
 .chart-card {
   padding: var(--space-lg);
   min-height: 350px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
@@ -547,6 +548,7 @@ body {
 .chart-card__body {
   flex: 1;
   min-height: 0;
+  min-width: 0;
 }
 
 /* ---- Responsive ---- */
@@ -563,17 +565,20 @@ body {
 
   .app-main {
     flex-direction: column;
+    overflow: visible;
   }
 
   .filter-panel {
     width: 100%;
-    min-width: 100%;
+    min-width: 0;
     height: auto;
     border-right: none;
     border-bottom: 1px solid var(--color-border);
   }
 
   .charts-area {
+    width: 100%;
+    min-width: 0;
     height: auto;
   }
 
