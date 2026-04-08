@@ -34,7 +34,7 @@ export const FunnelChart: React.FC = () => {
           fontSize: 12,
           fontFamily: 'Noto Sans TC, Inter, sans-serif',
           formatter: (params: { name: string; value: number }) => {
-            return `${params.name}\n${params.value.toFixed(2)}%`;
+            return `${params.name} ${params.value.toFixed(2)}%`;
           },
         },
         labelLine: {
