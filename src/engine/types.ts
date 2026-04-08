@@ -5,14 +5,15 @@
 /** 性別 */
 export type Gender = 'male' | 'female';
 
-/** 年齡區間 */
+/** 年齡區間（對齊內政部婚姻統計 8 級制） */
 export type AgeRange =
-  | '18-24'
-  | '25-29'
-  | '30-34'
-  | '35-39'
-  | '40-44'
-  | '45-49'
+  | '<=20'
+  | '21-25'
+  | '26-30'
+  | '31-35'
+  | '36-40'
+  | '41-45'
+  | '46-50'
   | '50+';
 
 /** 身高區間（公分） */
@@ -46,12 +47,11 @@ export type MBTIType = 'INTJ' | 'INTP' | 'ENTJ' | 'ENTP' | 'INFJ' | 'INFP' | 'EN
 /** 產業職業 */
 export type Industry = 'tech_it' | 'manufacturing' | 'finance' | 'medical' | 'public_edu' | 'service_retail' | 'other';
 
-/** 教育程度 */
+/** 教育程度（對齊內政部婚姻統計 5 級制） */
 export type Education =
   | 'below_high_school'
   | 'high_school'
-  | 'vocational'
-  | 'bachelor'
+  | 'college'
   | 'master'
   | 'doctoral';
 
@@ -80,6 +80,10 @@ export type Region =
 /** 篩選條件 */
 export interface FilterCriteria {
   gender: Gender;
+  /** 用戶自身年齡層（用於交叉概率） */
+  myAgeRange?: AgeRange;
+  /** 用戶自身學歷（用於交叉概率） */
+  myEducation?: Education;
   ageRanges: AgeRange[];
   heightRanges: HeightRange[];
   weightRanges: WeightRange[];
@@ -98,18 +102,31 @@ export type Distribution<T extends string> = Partial<Record<T, number>>;
 /** 按性別分的分布 */
 export type GenderedDistribution<T extends string> = Record<Gender, Distribution<T>>;
 
+/** 交叉分布矩陣（row=自己, col=對方, 值=條件概率） */
+export type CrossDistributionMatrix<T extends string> = Record<T, Record<T, number>>;
+
 /** 單步篩選結果 */
 export interface FunnelStep {
   label: string;
+  /** 實體累積比例 (Marginal cumulative) 用於漏斗寬度與物理計算 */
   percentage: number;
+  /** 對應的物理實體過濾人數 */
   population: number;
+  /** 婚配命中率 (Conditional cumulative) 用於說明 */
+  conditionalPercentage?: number;
 }
 
 /** 分析結果 */
 export interface AnalysisResult {
+  /** 聯合目標機率（有填我的條件時為婚配命中率） */
   finalPercentage: number;
+  /** 實體人口聯合機率（純邊際物理比例） */
+  physicalPercentage: number;
+  /** 預估全台符合條件人數 */
   estimatedPopulation: number;
+  /** 漏斗圖各層數據 */
   funnelSteps: FunnelStep[];
+  /** 各維度的篩選比例（用於顯示 UI Chip 的獨立數字） */
   dimensionPercentages: {
     gender: number;
     age: number;
@@ -127,12 +144,13 @@ export interface AnalysisResult {
 
 /** 標籤映射 */
 export const AGE_LABELS: Record<AgeRange, string> = {
-  '18-24': '18-24 歲',
-  '25-29': '25-29 歲',
-  '30-34': '30-34 歲',
-  '35-39': '35-39 歲',
-  '40-44': '40-44 歲',
-  '45-49': '45-49 歲',
+  '<=20': '20 歲以下',
+  '21-25': '21-25 歲',
+  '26-30': '26-30 歲',
+  '31-35': '31-35 歲',
+  '36-40': '36-40 歲',
+  '41-45': '41-45 歲',
+  '46-50': '46-50 歲',
   '50+': '50 歲以上',
 };
 
@@ -184,9 +202,8 @@ export const MBTI_LABELS: Record<MBTIType, string> = {
 
 export const EDUCATION_LABELS: Record<Education, string> = {
   below_high_school: '國中以下',
-  high_school: '高中職',
-  vocational: '專科',
-  bachelor: '大學',
+  high_school: '高中(職)',
+  college: '專科及大學',
   master: '碩士',
   doctoral: '博士',
 };

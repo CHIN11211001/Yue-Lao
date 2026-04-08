@@ -4,7 +4,9 @@ export const Footer: React.FC = () => {
   return (
     <footer className="app-footer" id="app-footer">
       <p>
-        📊 數據來源：內政部戶政司、衛福部國健署、行政院主計總處（2023-2024）
+        📊 數據來源：內政部戶政司、衛福部國健署、行政院主計總處（2023-2024）<br />
+        📚 人口普查來源：<a href="https://www.stat.gov.tw/News_Content.aspx?Create=1&n=2752&state=1327FD6AD8DCDA52&s=230649&ccms_cs=1&sms=11064" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-gold-primary)', textDecoration: 'underline' }}>109年人口及住宅普查總報告提要分析</a><br />
+        🔗 婚配分析來源：<a href="https://www.moi.gov.tw/News_Content.aspx?n=2905&s=328924" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-gold-primary)', textDecoration: 'underline' }}>114年第25週內政統計通報（婚姻階梯）</a>
       </p>
       <p>
         ⚠️ 交叉分析結果為統計推估值，各條件假設為獨立分布。實際數據可能因相關性而有差異。

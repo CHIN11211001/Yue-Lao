@@ -25,6 +25,8 @@ interface FilterState extends FilterCriteria {
 
   /** 動作 */
   setGender: (gender: Gender) => void;
+  setMyAgeRange: (range: AgeRange | undefined) => void;
+  setMyEducation: (edu: Education | undefined) => void;
   toggleAgeRange: (range: AgeRange) => void;
   toggleHeightRange: (range: HeightRange) => void;
   toggleWeightRange: (range: WeightRange) => void;
@@ -35,11 +37,14 @@ interface FilterState extends FilterCriteria {
   toggleZodiac: (zodiac: Zodiac) => void;
   toggleMbti: (mbti: MBTIType) => void;
   toggleIndustry: (industry: Industry) => void;
+  setField: <K extends keyof FilterCriteria>(field: K, value: FilterCriteria[K]) => void;
   resetAll: () => void;
 }
 
 const DEFAULT_CRITERIA: FilterCriteria = {
   gender: 'male',
+  myAgeRange: undefined,
+  myEducation: undefined,
   ageRanges: [],
   heightRanges: [],
   weightRanges: [],
@@ -70,6 +75,18 @@ export const useFilterStore = create<FilterState>((set) => ({
     set((state) => {
       const next = { ...state, gender };
       return { gender, result: recalculate(next) };
+    }),
+
+  setMyAgeRange: (myAgeRange) =>
+    set((state) => {
+      const next = { ...state, myAgeRange };
+      return { myAgeRange, result: recalculate(next) };
+    }),
+
+  setMyEducation: (myEducation) =>
+    set((state) => {
+      const next = { ...state, myEducation };
+      return { myEducation, result: recalculate(next) };
     }),
 
   toggleAgeRange: (range) =>
@@ -140,6 +157,12 @@ export const useFilterStore = create<FilterState>((set) => ({
       const industries = toggleInArray(state.industries, industry);
       const next = { ...state, industries };
       return { industries, result: recalculate(next) };
+    }),
+
+  setField: (field, value) =>
+    set((state) => {
+      const next = { ...state, [field]: value };
+      return { [field]: value, result: recalculate(next) };
     }),
 
   resetAll: () =>

@@ -9,8 +9,14 @@ export const FunnelChart: React.FC = () => {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'item' as const,
-      formatter: (params: { name: string; value: number; data: { population: number } }) => {
-        return `${params.name}<br/>比例：${params.value.toFixed(4)}%<br/>人數：${params.data.population.toLocaleString()} 人`;
+      formatter: (params: { name: string; value: number; data: { population: number; conditionalPercentage?: number } }) => {
+        let text = `${params.name}<br/>`;
+        text += `實體比例：${params.value.toFixed(4)}%<br/>`;
+        text += `預估人數：${params.data.population.toLocaleString()} 人`;
+        if (params.data.conditionalPercentage !== undefined && params.data.conditionalPercentage !== params.value / 100) {
+           text += `<br/><br/><i>💡 婚配契合機率：${(params.data.conditionalPercentage * 100).toFixed(4)}%</i>`;
+        }
+        return text;
       },
     },
     series: [
@@ -33,8 +39,11 @@ export const FunnelChart: React.FC = () => {
           color: '#f0f0f5',
           fontSize: 12,
           fontFamily: 'Noto Sans TC, Inter, sans-serif',
-          formatter: (params: { name: string; value: number }) => {
-            return `${params.name} ${params.value.toFixed(2)}%`;
+          formatter: (params: { name: string; value: number; data: { conditionalPercentage?: number } }) => {
+            const hasCondDiff = params.data.conditionalPercentage !== undefined && Math.abs(params.data.conditionalPercentage * 100 - params.value) > 0.001;
+            return hasCondDiff 
+              ? `${params.name} ${params.value.toFixed(2)}% | 契合 ${(params.data.conditionalPercentage! * 100).toFixed(1)}%`
+              : `${params.name} ${params.value.toFixed(2)}%`;
           },
         },
         labelLine: {
@@ -52,6 +61,7 @@ export const FunnelChart: React.FC = () => {
           value: +(step.percentage * 100).toFixed(4),
           name: step.label,
           population: step.population,
+          conditionalPercentage: step.conditionalPercentage,
           itemStyle: {
             color: {
               type: 'linear' as const,

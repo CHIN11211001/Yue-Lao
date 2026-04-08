@@ -366,6 +366,29 @@ body {
   font-family: var(--font-mono);
 }
 
+.filter-section__quick-actions {
+  display: flex;
+  gap: 2px;
+  margin-left: var(--space-xs);
+}
+
+.filter-section__quick-actions button {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.filter-section__quick-actions button:hover {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.1);
+}
+
 /* ---- Chip Select ---- */
 .chip-group {
   display: flex;
@@ -439,6 +462,72 @@ body {
   color: var(--color-gold-light);
   border-color: rgba(231, 76, 60, 0.4);
   box-shadow: 0 0 16px rgba(231, 76, 60, 0.15);
+}
+
+/* ---- My Conditions Section ---- */
+.filter-section--my-info {
+  padding: var(--space-md);
+  background: linear-gradient(135deg, rgba(243, 156, 18, 0.06), rgba(231, 76, 60, 0.04));
+  border: 1px solid rgba(243, 156, 18, 0.15);
+  border-radius: var(--radius-md);
+}
+
+.filter-section__hint {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.my-conditions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.my-conditions-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.my-conditions-field label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.my-conditions-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 8px 32px 8px 12px;
+  font-size: 0.8rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  background: var(--color-bg-input);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23f0f0f5' fill-opacity='0.5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.my-conditions-field select:hover {
+  border-color: rgba(243, 156, 18, 0.3);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.my-conditions-field select:focus {
+  outline: none;
+  border-color: var(--color-gold-primary);
+  box-shadow: 0 0 0 2px rgba(243, 156, 18, 0.15);
+}
+
+.my-conditions-field select option {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
 }
 
 /* ---- Charts Area ---- */

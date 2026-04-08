@@ -20,13 +20,16 @@ export const ResultSummary: React.FC = () => {
   }
 
   const popStr = result.estimatedPopulation.toLocaleString('zh-TW');
-  const desc = probabilityToDescription(result.finalPercentage);
-  const ratio = probabilityToRatio(result.finalPercentage);
+  const desc = probabilityToDescription(result.physicalPercentage);
+  const ratio = probabilityToRatio(result.physicalPercentage);
+
+  const isMatchDiverged = Math.abs(result.finalPercentage - result.physicalPercentage) > 0.0000001;
+  const labelText = isMatchDiverged ? '婚配契合機率' : '符合條件比例';
 
   return (
     <div className="result-summary" id="result-summary">
       <div className="glass-card result-card" id="result-card-percentage">
-        <div className="result-card__label">符合條件比例</div>
+        <div className="result-card__label">{labelText}</div>
         <div className="result-card__value result-card__value--gradient">
           {pctStr}%
         </div>

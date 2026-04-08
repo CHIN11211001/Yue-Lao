@@ -57,12 +57,73 @@ const GenderSection: React.FC = () => {
   );
 };
 
+/* ---- 我的條件 ---- */
+
+const MyConditionsSection: React.FC = () => {
+  const myAgeRange = useFilterStore((s) => s.myAgeRange);
+  const myEducation = useFilterStore((s) => s.myEducation);
+  const setMyAgeRange = useFilterStore((s) => s.setMyAgeRange);
+  const setMyEducation = useFilterStore((s) => s.setMyEducation);
+
+  const ageKeys = Object.keys(AGE_LABELS) as AgeRange[];
+  const eduKeys = Object.keys(EDUCATION_LABELS) as Education[];
+
+  return (
+    <div className="filter-section filter-section--my-info" id="filter-my-conditions">
+      <div className="filter-section__header">
+        <span className="filter-section__icon">💡</span>
+        <span className="filter-section__title">我的條件</span>
+        <span className="filter-section__hint">（可選，啟用婚配分析）</span>
+      </div>
+      <div className="my-conditions-grid">
+        <div className="my-conditions-field">
+          <label htmlFor="my-age-select">我的年齡層</label>
+          <select
+            id="my-age-select"
+            value={myAgeRange || ''}
+            onChange={(e) =>
+              setMyAgeRange(e.target.value ? (e.target.value as AgeRange) : undefined)
+            }
+          >
+            <option value="">不指定</option>
+            {ageKeys.map((key) => (
+              <option key={key} value={key}>
+                {AGE_LABELS[key]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="my-conditions-field">
+          <label htmlFor="my-edu-select">我的學歷</label>
+          <select
+            id="my-edu-select"
+            value={myEducation || ''}
+            onChange={(e) =>
+              setMyEducation(e.target.value ? (e.target.value as Education) : undefined)
+            }
+          >
+            <option value="">不指定</option>
+            {eduKeys.map((key) => (
+              <option key={key} value={key}>
+                {EDUCATION_LABELS[key]}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ---- ChipGroup ---- */
+
 interface ChipGroupProps<T extends string> {
   title: string;
   icon: string;
   labels: Record<T, string>;
   selected: T[];
   onToggle: (value: T) => void;
+  onSetAll?: (values: T[]) => void;
   percentage: number;
   sectionId: string;
 }
@@ -73,17 +134,35 @@ function ChipGroup<T extends string>({
   labels,
   selected,
   onToggle,
+  onSetAll,
   percentage,
   sectionId,
 }: ChipGroupProps<T>) {
   const keys = Object.keys(labels) as T[];
   const showPercent = selected.length > 0;
 
+  const handleSelectAll = () => onSetAll && onSetAll(keys);
+  const handleInvert = () => {
+    if (!onSetAll) return;
+    const newSelected = keys.filter((k) => !selected.includes(k));
+    onSetAll(newSelected);
+  };
+  const handleClear = () => onSetAll && onSetAll([]);
+
   return (
     <div className="filter-section" id={sectionId}>
       <div className="filter-section__header">
         <span className="filter-section__icon">{icon}</span>
         <span className="filter-section__title">{title}</span>
+        
+        {onSetAll && (
+          <div className="filter-section__quick-actions">
+            <button onClick={handleSelectAll} title="全選所有選項">全選</button>
+            <button onClick={handleInvert} title="反向選取">反選</button>
+            <button onClick={handleClear} title="清除選取">清除</button>
+          </div>
+        )}
+
         {showPercent && (
           <span className="filter-section__percentage">
             {(percentage * 100).toFixed(1)}%
@@ -115,12 +194,15 @@ export const FilterPanel: React.FC = () => {
     <aside className="filter-panel" id="filter-panel">
       <GenderSection />
 
+      <MyConditionsSection />
+
       <ChipGroup<AgeRange>
         title="年齡區間"
         icon="🎂"
         labels={AGE_LABELS}
         selected={store.ageRanges}
         onToggle={store.toggleAgeRange}
+        onSetAll={(vals) => store.setField('ageRanges', vals)}
         percentage={store.result.dimensionPercentages.age}
         sectionId="filter-age"
       />
@@ -131,6 +213,7 @@ export const FilterPanel: React.FC = () => {
         labels={HEIGHT_LABELS}
         selected={store.heightRanges}
         onToggle={store.toggleHeightRange}
+        onSetAll={(vals) => store.setField('heightRanges', vals)}
         percentage={store.result.dimensionPercentages.height}
         sectionId="filter-height"
       />
@@ -141,6 +224,7 @@ export const FilterPanel: React.FC = () => {
         labels={WEIGHT_LABELS}
         selected={store.weightRanges}
         onToggle={store.toggleWeightRange}
+        onSetAll={(vals) => store.setField('weightRanges', vals)}
         percentage={store.result.dimensionPercentages.weight}
         sectionId="filter-weight"
       />
@@ -151,6 +235,7 @@ export const FilterPanel: React.FC = () => {
         labels={EDUCATION_LABELS}
         selected={store.educations}
         onToggle={store.toggleEducation}
+        onSetAll={(vals) => store.setField('educations', vals)}
         percentage={store.result.dimensionPercentages.education}
         sectionId="filter-education"
       />
@@ -161,6 +246,7 @@ export const FilterPanel: React.FC = () => {
         labels={INCOME_LABELS}
         selected={store.incomeRanges}
         onToggle={store.toggleIncomeRange}
+        onSetAll={(vals) => store.setField('incomeRanges', vals)}
         percentage={store.result.dimensionPercentages.income}
         sectionId="filter-income"
       />
@@ -171,6 +257,7 @@ export const FilterPanel: React.FC = () => {
         labels={INDUSTRY_LABELS}
         selected={store.industries}
         onToggle={store.toggleIndustry}
+        onSetAll={(vals) => store.setField('industries', vals)}
         percentage={store.result.dimensionPercentages.industry}
         sectionId="filter-industry"
       />
@@ -181,6 +268,7 @@ export const FilterPanel: React.FC = () => {
         labels={MARRIAGE_LABELS}
         selected={store.marriageStatuses}
         onToggle={store.toggleMarriageStatus}
+        onSetAll={(vals) => store.setField('marriageStatuses', vals)}
         percentage={store.result.dimensionPercentages.marriage}
         sectionId="filter-marriage"
       />
@@ -191,6 +279,7 @@ export const FilterPanel: React.FC = () => {
         labels={REGION_LABELS}
         selected={store.regions}
         onToggle={store.toggleRegion}
+        onSetAll={(vals) => store.setField('regions', vals)}
         percentage={store.result.dimensionPercentages.region}
         sectionId="filter-region"
       />
@@ -201,6 +290,7 @@ export const FilterPanel: React.FC = () => {
         labels={ZODIAC_LABELS}
         selected={store.zodiacs}
         onToggle={store.toggleZodiac}
+        onSetAll={(vals) => store.setField('zodiacs', vals)}
         percentage={store.result.dimensionPercentages.zodiac}
         sectionId="filter-zodiac"
       />
@@ -211,6 +301,7 @@ export const FilterPanel: React.FC = () => {
         labels={MBTI_LABELS}
         selected={store.mbtis}
         onToggle={store.toggleMbti}
+        onSetAll={(vals) => store.setField('mbtis', vals)}
         percentage={store.result.dimensionPercentages.mbti}
         sectionId="filter-mbti"
       />
