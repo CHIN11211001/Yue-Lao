@@ -14,7 +14,8 @@ export function sumSelectedProbability<T extends string>(
   selected: T[]
 ): number {
   if (selected.length === 0) return 1; // 未選 = 不限制 = 100%
-  return selected.reduce((sum, key) => sum + (distribution[key] || 0), 0);
+  const sum = selected.reduce((s, key) => s + (distribution[key] || 0), 0);
+  return Math.min(1, sum);
 }
 
 /**
@@ -73,7 +74,8 @@ export function sumSelectedFromCrossMatrix<T extends string>(
   if (selected.length === 0) return 1; // 未選 = 不限制 = 100%
   const row = matrix[myKey];
   if (!row) return 1;
-  return selected.reduce((sum, key) => sum + (row[key] || 0), 0);
+  const sum = selected.reduce((s, key) => s + (row[key] || 0), 0);
+  return Math.min(1, sum);
 }
 
 /**

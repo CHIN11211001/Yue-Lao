@@ -49,31 +49,20 @@ const AGE_KEYS: AgeRange[] = ['<=20', '21-25', '26-30', '31-35', '36-40', '41-45
 function buildCrossMatrix<T extends string>(
   raw: Record<T, number[]>,
   keys: T[],
-  totals: Record<T, number>,
 ): CrossDistributionMatrix<T> {
   const matrix = {} as CrossDistributionMatrix<T>;
   for (const myKey of keys) {
     const row = {} as Record<T, number>;
-    const total = totals[myKey];
+    const rowValues = raw[myKey];
+    const rowTotal = rowValues.reduce((sum, val) => sum + val, 0);
+    
     for (let i = 0; i < keys.length; i++) {
-      row[keys[i]] = total > 0 ? raw[myKey][i] / total : 0;
+      row[keys[i]] = rowTotal > 0 ? rowValues[i] / rowTotal : 0;
     }
     matrix[myKey] = row;
   }
   return matrix;
 }
-
-// 男性各年齡層合計
-const MALE_AGE_TOTALS: Record<AgeRange, number> = {
-  '<=20': 0.93, '21-25': 7.44, '26-30': 27.72, '31-35': 30.26,
-  '36-40': 15.17, '41-45': 8.09, '46-50': 3.72, '50+': 6.67,
-};
-
-// 女性各年齡層合計
-const FEMALE_AGE_TOTALS: Record<AgeRange, number> = {
-  '<=20': 1.90, '21-25': 11.19, '26-30': 34.05, '31-35': 27.93,
-  '36-40': 11.34, '41-45': 6.07, '46-50': 3.09, '50+': 4.43,
-};
 
 /**
  * 年齡交叉概率矩陣（按性別分）
@@ -82,8 +71,8 @@ const FEMALE_AGE_TOTALS: Record<AgeRange, number> = {
  * AGE_CROSS_MATRIX.female[myAge][targetMaleAge] = P(男方年齡 | 女方年齡)
  */
 export const AGE_CROSS_MATRIX = {
-  male: buildCrossMatrix(RAW_AGE_MALE, AGE_KEYS, MALE_AGE_TOTALS),
-  female: buildCrossMatrix(RAW_AGE_FEMALE, AGE_KEYS, FEMALE_AGE_TOTALS),
+  male: buildCrossMatrix(RAW_AGE_MALE, AGE_KEYS),
+  female: buildCrossMatrix(RAW_AGE_FEMALE, AGE_KEYS),
 };
 
 // ========================================
@@ -111,16 +100,6 @@ const RAW_EDU_FEMALE: Record<EduKey, [number, number, number, number, number]> =
   doctoral:          [0.00, 0.01, 0.14, 0.16, 0.08],  // 合計 0.39
 };
 
-const MALE_EDU_TOTALS: Record<EduKey, number> = {
-  below_high_school: 4.28, high_school: 21.42, college: 56.54,
-  master: 16.64, doctoral: 1.13,
-};
-
-const FEMALE_EDU_TOTALS: Record<EduKey, number> = {
-  below_high_school: 3.95, high_school: 17.69, college: 66.66,
-  master: 11.32, doctoral: 0.39,
-};
-
 /**
  * 教育程度交叉概率矩陣（按性別分）
  *
@@ -128,6 +107,6 @@ const FEMALE_EDU_TOTALS: Record<EduKey, number> = {
  * EDUCATION_CROSS_MATRIX.female[myEdu][targetMaleEdu] = P(男方學歷 | 女方學歷)
  */
 export const EDUCATION_CROSS_MATRIX = {
-  male: buildCrossMatrix(RAW_EDU_MALE, EDU_KEYS, MALE_EDU_TOTALS),
-  female: buildCrossMatrix(RAW_EDU_FEMALE, EDU_KEYS, FEMALE_EDU_TOTALS),
+  male: buildCrossMatrix(RAW_EDU_MALE, EDU_KEYS),
+  female: buildCrossMatrix(RAW_EDU_FEMALE, EDU_KEYS),
 };
