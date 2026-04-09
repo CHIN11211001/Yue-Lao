@@ -27,6 +27,28 @@ import {
 
 /* ---- 小型子元件 ---- */
 
+interface InfoTooltipProps {
+  label: string;
+  content: string;
+}
+
+const InfoTooltip: React.FC<InfoTooltipProps> = ({ label, content }) => {
+  return (
+    <span className="info-tooltip">
+      <button
+        type="button"
+        className="info-tooltip__trigger"
+        aria-label={label}
+      >
+        i
+      </button>
+      <span className="info-tooltip__bubble" role="tooltip">
+        {content}
+      </span>
+    </span>
+  );
+};
+
 const GenderSection: React.FC = () => {
   const gender = useFilterStore((s) => s.gender);
   const setGender = useFilterStore((s) => s.setGender);
@@ -72,8 +94,16 @@ const MyConditionsSection: React.FC = () => {
     <div className="filter-section filter-section--my-info" id="filter-my-conditions">
       <div className="filter-section__header">
         <span className="filter-section__icon">💡</span>
-        <span className="filter-section__title">我的條件</span>
-        <span className="filter-section__hint">（可選，啟用婚配分析）</span>
+        <div className="filter-section__title-container">
+          <div className="filter-section__title-row">
+            <span className="filter-section__title">我的條件</span>
+            <InfoTooltip
+              label="我的條件說明"
+              content="這兩個欄位會作為條件機率表的上游條件，影響年齡配對、學歷配對，以及收入和產業的 CPT 計算。"
+            />
+          </div>
+          <span className="filter-section__hint filter-section__hint--inline">（可選，啟用婚配分析）</span>
+        </div>
       </div>
       <div className="my-conditions-grid">
         <div className="my-conditions-field">
@@ -127,6 +157,7 @@ interface ChipGroupProps<T extends string> {
   percentage: number;
   sectionId: string;
   hint?: string;
+  tooltip?: string;
 }
 
 function ChipGroup<T extends string>({
@@ -139,6 +170,7 @@ function ChipGroup<T extends string>({
   percentage,
   sectionId,
   hint,
+  tooltip,
 }: ChipGroupProps<T>) {
   const keys = Object.keys(labels) as T[];
   const showPercent = selected.length > 0;
@@ -156,7 +188,15 @@ function ChipGroup<T extends string>({
       <div className="filter-section__header">
         <span className="filter-section__icon">{icon}</span>
         <div className="filter-section__title-container">
-          <span className="filter-section__title">{title}</span>
+          <div className="filter-section__title-row">
+            <span className="filter-section__title">{title}</span>
+            {tooltip && (
+              <InfoTooltip
+                label={`${title} 說明`}
+                content={tooltip}
+              />
+            )}
+          </div>
           {hint && <span className="filter-section__hint filter-section__hint--inline">{hint}</span>}
         </div>
         
@@ -214,6 +254,7 @@ export const FilterPanel: React.FC = () => {
         onSetAll={(vals) => store.setField('ageRanges', vals)}
         percentage={store.result.dimensionPercentages.age}
         sectionId="filter-age"
+        tooltip="若有設定「我的年齡層」，這裡會使用年齡配對 CPT 來估算對方年齡分布，而不是直接用全體年齡平均。"
       />
 
       <ChipGroup<HeightRange>
@@ -247,6 +288,7 @@ export const FilterPanel: React.FC = () => {
         onSetAll={(vals) => store.setField('educations', vals)}
         percentage={store.result.dimensionPercentages.education}
         sectionId="filter-education"
+        tooltip="若有設定「我的學歷」，這裡會使用學歷配對 CPT 估算對方學歷分布。"
       />
 
       <ChipGroup<IncomeRange>
@@ -258,6 +300,7 @@ export const FilterPanel: React.FC = () => {
         onSetAll={(vals) => store.setField('incomeRanges', vals)}
         percentage={store.result.dimensionPercentages.income}
         sectionId="filter-income"
+        tooltip="使用 P(收入 | 年齡, 學歷, 性別) 的條件機率表。現階段以官方收入分布為基底，再按年齡與學歷趨勢做 heuristic 校準。"
       />
 
       <ChipGroup<Industry>
@@ -269,6 +312,7 @@ export const FilterPanel: React.FC = () => {
         onSetAll={(vals) => store.setField('industries', vals)}
         percentage={store.result.dimensionPercentages.industry}
         sectionId="filter-industry"
+        tooltip="使用 P(產業 | 年齡, 學歷, 性別) 的條件機率表。現階段以行業別統計為基底，再按年齡與學歷趨勢做 heuristic 校準。"
       />
 
       <ChipGroup<MarriageStatus>
@@ -280,6 +324,7 @@ export const FilterPanel: React.FC = () => {
         onSetAll={(vals) => store.setField('marriageStatuses', vals)}
         percentage={store.result.dimensionPercentages.marriage}
         sectionId="filter-marriage"
+        tooltip="使用 P(婚姻狀態 | 年齡, 性別) 的條件機率表加權。若你有先選年齡區間，婚姻比例會跟著那組年齡條件變動。"
       />
 
       <ChipGroup<Region>

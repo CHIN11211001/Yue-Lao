@@ -67,5 +67,16 @@ npm run build
 
 ---
 
+## 🧭 模型演進
+
+目前的前端推估仍以「多數維度近似獨立」為主，只有部分條件有交叉機率修正。
+
+- 近期優先方向：補齊可解釋的條件機率表（conditional probability tables）
+- 中期研究方向：Bayesian network / log-linear model
+
+詳細規劃請見 [TODO.md](./TODO.md)。
+
+---
+
 > 開發者：CHIN11211001  
 > 授權：此專案僅作為個人開發練習與展示作品使用。

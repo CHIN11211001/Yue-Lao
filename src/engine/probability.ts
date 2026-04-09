@@ -1,7 +1,12 @@
 // ========================================
 // 機率計算模組
 // ========================================
-import type { Distribution, CrossDistributionMatrix } from './types';
+import type {
+  Distribution,
+  CrossDistributionMatrix,
+  ConditionalProbabilityTable,
+  NestedConditionalProbabilityTable,
+} from './types';
 
 /**
  * 計算選中項目在分布中佔的總比例
@@ -79,38 +84,127 @@ export function sumSelectedFromCrossMatrix<T extends string>(
 }
 
 /**
- * 計算年齡權重下的婚姻狀態聯合條件機率
- * @param ageDistribution 年齡權重分佈 (可以是 Marginal 或 Conditional)
- * @param ageMarriageMatrix 年齡-婚姻狀態 分佈矩陣
- * @param selectedAges 選中的年齡條件
- * @param selectedStatuses 選中的婚姻狀態條件
+ * 從條件機率表取出指定條件下的分布
+ * @param table 條件機率表 table[conditionKey][targetKey] = P(target | condition)
+ * @param conditionKey 條件鍵值
+ * @param fallback 無對應資料時的回退分布
+ * @returns 條件分布
  */
-export function calculateMarriageProbWeightedByAge<Age extends string, Status extends string>(
-  ageDistribution: Distribution<Age>,
-  ageMarriageMatrix: Record<Age, Record<Status, number>>,
-  selectedAges: Age[],
-  selectedStatuses: Status[]
-): number {
-  if (selectedStatuses.length === 0) return 1;
+export function getConditionalDistribution<
+  ConditionKey extends string,
+  TargetKey extends string,
+>(
+  table: ConditionalProbabilityTable<ConditionKey, TargetKey>,
+  conditionKey: ConditionKey | undefined,
+  fallback: Distribution<TargetKey>
+): Distribution<TargetKey> {
+  if (!conditionKey) return fallback;
+  return table[conditionKey] || fallback;
+}
 
-  const targetAges = selectedAges.length > 0 ? selectedAges : (Object.keys(ageDistribution) as Age[]);
-  
-  let totalAgeWeight = 0;
+/**
+ * 在已知條件維度分布下，計算目標條件的加權條件機率
+ * @param conditionDistribution 條件維度權重分佈 (可以是 Marginal 或 Conditional)
+ * @param conditionalTable 條件機率表
+ * @param selectedConditions 選中的條件鍵值
+ * @param selectedTargets 選中的目標鍵值
+ */
+export function calculateWeightedConditionalProbability<
+  ConditionKey extends string,
+  TargetKey extends string,
+>(
+  conditionDistribution: Distribution<ConditionKey>,
+  conditionalTable: ConditionalProbabilityTable<ConditionKey, TargetKey>,
+  selectedConditions: ConditionKey[],
+  selectedTargets: TargetKey[]
+): number {
+  if (selectedTargets.length === 0) return 1;
+
+  const targetConditions =
+    selectedConditions.length > 0
+      ? selectedConditions
+      : (Object.keys(conditionDistribution) as ConditionKey[]);
+
+  let totalConditionWeight = 0;
   let jointProb = 0;
-  
-  for (const age of targetAges) {
-    const pAge = ageDistribution[age] || 0;
-    totalAgeWeight += pAge;
-    
-    let pStatusGivenAge = 0;
-    for (const status of selectedStatuses) {
-      if (ageMarriageMatrix[age]) {
-        pStatusGivenAge += ageMarriageMatrix[age][status] || 0;
+
+  for (const condition of targetConditions) {
+    const pCondition = conditionDistribution[condition] || 0;
+    totalConditionWeight += pCondition;
+
+    let pTargetGivenCondition = 0;
+    for (const target of selectedTargets) {
+      if (conditionalTable[condition]) {
+        pTargetGivenCondition += conditionalTable[condition][target] || 0;
       }
     }
-    
-    jointProb += pAge * pStatusGivenAge;
+
+    jointProb += pCondition * pTargetGivenCondition;
   }
-  
-  return totalAgeWeight > 0 ? jointProb / totalAgeWeight : 0;
+
+  return totalConditionWeight > 0 ? jointProb / totalConditionWeight : 0;
+}
+
+/**
+ * 在兩個條件維度下，計算目標條件的加權條件機率
+ * @param primaryDistribution 第一條件維度權重分佈
+ * @param secondaryDistribution 第二條件維度權重分佈
+ * @param conditionalTable 巢狀條件機率表 table[primary][secondary][target]
+ * @param selectedPrimary 選中的第一條件鍵值
+ * @param selectedSecondary 選中的第二條件鍵值
+ * @param selectedTargets 選中的目標鍵值
+ */
+export function calculateWeightedConditionalProbability2D<
+  PrimaryKey extends string,
+  SecondaryKey extends string,
+  TargetKey extends string,
+>(
+  primaryDistribution: Distribution<PrimaryKey>,
+  secondaryDistribution: Distribution<SecondaryKey>,
+  conditionalTable: NestedConditionalProbabilityTable<PrimaryKey, SecondaryKey, TargetKey>,
+  selectedPrimary: PrimaryKey[],
+  selectedSecondary: SecondaryKey[],
+  selectedTargets: TargetKey[]
+): number {
+  if (selectedTargets.length === 0) return 1;
+
+  const targetPrimary =
+    selectedPrimary.length > 0
+      ? selectedPrimary
+      : (Object.keys(primaryDistribution) as PrimaryKey[]);
+  const targetSecondary =
+    selectedSecondary.length > 0
+      ? selectedSecondary
+      : (Object.keys(secondaryDistribution) as SecondaryKey[]);
+
+  let totalWeight = 0;
+  let jointProb = 0;
+
+  for (const primary of targetPrimary) {
+    const pPrimary = primaryDistribution[primary] || 0;
+    if (pPrimary <= 0) continue;
+
+    const secondaryTable = conditionalTable[primary];
+    if (!secondaryTable) continue;
+
+    for (const secondary of targetSecondary) {
+      const pSecondary = secondaryDistribution[secondary] || 0;
+      if (pSecondary <= 0) continue;
+
+      const targetDistribution = secondaryTable[secondary];
+      if (!targetDistribution) continue;
+
+      const conditionWeight = pPrimary * pSecondary;
+      totalWeight += conditionWeight;
+
+      let pTargetGivenConditions = 0;
+      for (const target of selectedTargets) {
+        pTargetGivenConditions += targetDistribution[target] || 0;
+      }
+
+      jointProb += conditionWeight * pTargetGivenConditions;
+    }
+  }
+
+  return totalWeight > 0 ? jointProb / totalWeight : 0;
 }

@@ -9,7 +9,7 @@ export const Footer: React.FC = () => {
         🔗 婚配分析來源：<a href="https://www.moi.gov.tw/News_Content.aspx?n=2905&s=328924" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-gold-primary)', textDecoration: 'underline' }}>114年第25週內政統計通報（婚姻階梯）</a>
       </p>
       <p>
-        ⚠️ 交叉分析結果為統計推估值，各條件假設為獨立分布。實際數據可能因相關性而有差異。
+        ⚠️ 交叉分析結果為統計推估值。目前已對年齡、學歷、婚姻、收入、產業做部分條件化，其餘維度仍可能因相關性而有誤差。
       </p>
       <p>
         🏮 月老 Yue Lao — 用數據看見緣分的機率

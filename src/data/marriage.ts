@@ -1,7 +1,13 @@
 // ========================================
 // 婚姻狀態 — 基於 2024 內政部戶政司統計
 // ========================================
-import type { MarriageStatus, GenderedDistribution, Gender, AgeRange } from '../engine/types';
+import type {
+  MarriageStatus,
+  GenderedDistribution,
+  Gender,
+  AgeRange,
+  ConditionalProbabilityTable,
+} from '../engine/types';
 
 /**
  * 15 歲以上常住人口婚姻狀態分布
@@ -24,7 +30,10 @@ export const MARRIAGE_DISTRIBUTION: GenderedDistribution<MarriageStatus> = {
  * 按年齡階層劃分的婚姻狀態比例 (解決「選擇年齡後未婚率不應該固定」的問題)
  * 資料來源：109 年人口及住宅普查 表 3-2 15歲以上常住人口之婚姻狀況
  */
-export const AGE_MARRIAGE_DISTRIBUTION: Record<Gender, Record<AgeRange, Record<MarriageStatus, number>>> = {
+export const MARRIAGE_BY_AGE_CPT: Record<
+  Gender,
+  ConditionalProbabilityTable<AgeRange, MarriageStatus>
+> = {
   male: {
     '<=20': { single: 0.997, married: 0.003, divorced_widowed: 0.000 },
     '21-25': { single: 0.966, married: 0.030, divorced_widowed: 0.004 },
@@ -46,3 +55,5 @@ export const AGE_MARRIAGE_DISTRIBUTION: Record<Gender, Record<AgeRange, Record<M
     '50+':   { single: 0.0531, married: 0.6374, divorced_widowed: 0.3095 }, // 加權平均
   }
 };
+
+export const AGE_MARRIAGE_DISTRIBUTION = MARRIAGE_BY_AGE_CPT;

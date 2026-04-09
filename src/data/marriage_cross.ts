@@ -3,7 +3,13 @@
 // 資料來源：114 年第 25 週內政統計通報
 // 112 年 7 月至 113 年 6 月結婚登記
 // ========================================
-import type { AgeRange, Education, CrossDistributionMatrix } from '../engine/types';
+import type {
+  AgeRange,
+  Education,
+  CrossDistributionMatrix,
+  ConditionalProbabilityTable,
+  Gender,
+} from '../engine/types';
 
 /**
  * 年齡層別結婚配對 — 條件概率矩陣
@@ -75,6 +81,9 @@ export const AGE_CROSS_MATRIX = {
   female: buildCrossMatrix(RAW_AGE_FEMALE, AGE_KEYS),
 };
 
+export const PARTNER_AGE_CPT: Record<Gender, ConditionalProbabilityTable<AgeRange, AgeRange>> =
+  AGE_CROSS_MATRIX;
+
 // ========================================
 // 教育程度交叉概率矩陣
 // ========================================
@@ -110,3 +119,8 @@ export const EDUCATION_CROSS_MATRIX = {
   male: buildCrossMatrix(RAW_EDU_MALE, EDU_KEYS),
   female: buildCrossMatrix(RAW_EDU_FEMALE, EDU_KEYS),
 };
+
+export const PARTNER_EDUCATION_CPT: Record<
+  Gender,
+  ConditionalProbabilityTable<Education, Education>
+> = EDUCATION_CROSS_MATRIX;

@@ -102,8 +102,21 @@ export type Distribution<T extends string> = Partial<Record<T, number>>;
 /** 按性別分的分布 */
 export type GenderedDistribution<T extends string> = Record<Gender, Distribution<T>>;
 
+/** 條件機率表（CPT） table[conditionKey][targetKey] = P(target | condition) */
+export type ConditionalProbabilityTable<
+  ConditionKey extends string,
+  TargetKey extends string,
+> = Record<ConditionKey, Record<TargetKey, number>>;
+
+/** 雙層條件機率表 table[outerKey][innerKey][targetKey] = P(target | outer, inner) */
+export type NestedConditionalProbabilityTable<
+  OuterKey extends string,
+  InnerKey extends string,
+  TargetKey extends string,
+> = Record<OuterKey, ConditionalProbabilityTable<InnerKey, TargetKey>>;
+
 /** 交叉分布矩陣（row=自己, col=對方, 值=條件概率） */
-export type CrossDistributionMatrix<T extends string> = Record<T, Record<T, number>>;
+export type CrossDistributionMatrix<T extends string> = ConditionalProbabilityTable<T, T>;
 
 /** 單步篩選結果 */
 export interface FunnelStep {
