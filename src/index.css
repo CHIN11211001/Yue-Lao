@@ -632,6 +632,12 @@ body {
 }
 
 /* ---- Result Summary ---- */
+.result-summary-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
 .result-summary {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -693,6 +699,17 @@ body {
 .result-card__subtitle {
   font-size: 0.8rem;
   color: var(--color-text-secondary);
+}
+
+.result-summary-note {
+  padding: 10px 14px;
+  border-left: 3px solid rgba(243, 156, 18, 0.75);
+  border-radius: var(--radius-sm);
+  background: rgba(243, 156, 18, 0.08);
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.65;
+  animation: fadeInUp 0.55s ease both;
 }
 
 /* ---- Chart Cards ---- */

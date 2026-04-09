@@ -208,3 +208,89 @@ export function calculateWeightedConditionalProbability2D<
 
   return totalWeight > 0 ? jointProb / totalWeight : 0;
 }
+
+/**
+ * 依序計算 A -> B -> C 的鏈式條件機率。
+ * 適合像「年齡 -> 身高 -> 體重」這種上游條件會影響下游分布的場景。
+ */
+export function calculateChainedConditionalProbabilities<
+  PrimaryKey extends string,
+  SecondaryKey extends string,
+  TargetKey extends string,
+>(
+  primaryDistribution: Distribution<PrimaryKey>,
+  secondaryTable: ConditionalProbabilityTable<PrimaryKey, SecondaryKey>,
+  targetTable: NestedConditionalProbabilityTable<PrimaryKey, SecondaryKey, TargetKey>,
+  selectedPrimary: PrimaryKey[],
+  selectedSecondary: SecondaryKey[],
+  selectedTargets: TargetKey[]
+): {
+  secondaryProbability: number;
+  targetProbability: number;
+  jointProbability: number;
+} {
+  const targetPrimary =
+    selectedPrimary.length > 0
+      ? selectedPrimary
+      : (Object.keys(primaryDistribution) as PrimaryKey[]);
+
+  let totalPrimaryWeight = 0;
+  let secondaryJointWeight = 0;
+  let targetJointWeight = 0;
+
+  for (const primary of targetPrimary) {
+    const pPrimary = primaryDistribution[primary] || 0;
+    if (pPrimary <= 0) continue;
+
+    const secondaryRow = secondaryTable[primary];
+    const targetRows = targetTable[primary];
+    if (!secondaryRow || !targetRows) continue;
+
+    totalPrimaryWeight += pPrimary;
+
+    const targetSecondary =
+      selectedSecondary.length > 0
+        ? selectedSecondary
+        : (Object.keys(secondaryRow) as SecondaryKey[]);
+
+    let pSelectedSecondaryGivenPrimary = 0;
+    let pSelectedTargetAndSecondaryGivenPrimary = 0;
+
+    for (const secondary of targetSecondary) {
+      const pSecondaryGivenPrimary = secondaryRow[secondary] || 0;
+      if (pSecondaryGivenPrimary <= 0) continue;
+
+      pSelectedSecondaryGivenPrimary += pSecondaryGivenPrimary;
+
+      const targetDistribution = targetRows[secondary];
+      if (!targetDistribution) continue;
+
+      const pSelectedTargetGivenConditions =
+        selectedTargets.length > 0
+          ? selectedTargets.reduce((sum, target) => sum + (targetDistribution[target] || 0), 0)
+          : 1;
+
+      pSelectedTargetAndSecondaryGivenPrimary +=
+        pSecondaryGivenPrimary * pSelectedTargetGivenConditions;
+    }
+
+    secondaryJointWeight += pPrimary * pSelectedSecondaryGivenPrimary;
+    targetJointWeight += pPrimary * pSelectedTargetAndSecondaryGivenPrimary;
+  }
+
+  const secondaryProbability =
+    totalPrimaryWeight > 0 ? secondaryJointWeight / totalPrimaryWeight : 0;
+  const targetProbability =
+    selectedTargets.length === 0
+      ? 1
+      : secondaryJointWeight > 0
+        ? targetJointWeight / secondaryJointWeight
+        : 0;
+  const jointProbability = totalPrimaryWeight > 0 ? targetJointWeight / totalPrimaryWeight : 0;
+
+  return {
+    secondaryProbability,
+    targetProbability,
+    jointProbability,
+  };
+}

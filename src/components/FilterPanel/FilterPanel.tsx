@@ -266,6 +266,7 @@ export const FilterPanel: React.FC = () => {
         onSetAll={(vals) => store.setField('heightRanges', vals)}
         percentage={store.result.dimensionPercentages.height}
         sectionId="filter-height"
+        tooltip="使用 P(身高 | 年齡, 性別) 的條件機率表。第一版依 2013-2016 國民營養調查的年齡別身高常模估算，所以不同年齡層會對應不同的身高分布。"
       />
 
       <ChipGroup<WeightRange>
@@ -277,6 +278,7 @@ export const FilterPanel: React.FC = () => {
         onSetAll={(vals) => store.setField('weightRanges', vals)}
         percentage={store.result.dimensionPercentages.weight}
         sectionId="filter-weight"
+        tooltip="使用 P(體重 | 身高, 年齡, 性別) 的條件機率表。也就是會先看年齡對身高的影響，再看該身高下的體重分布；體重不再和身高當成彼此獨立。第一版以 BMI 表為中介，再用年齡別體重常模校準整體分布。"
       />
 
       <ChipGroup<Education>

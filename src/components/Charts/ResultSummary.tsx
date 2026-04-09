@@ -27,29 +27,35 @@ export const ResultSummary: React.FC = () => {
   const labelText = isMatchDiverged ? '婚配契合機率' : '符合條件比例';
 
   return (
-    <div className="result-summary" id="result-summary">
-      <div className="glass-card result-card" id="result-card-percentage">
-        <div className="result-card__label">{labelText}</div>
-        <div className="result-card__value result-card__value--gradient">
-          {pctStr}%
+    <div className="result-summary-wrap" id="result-summary">
+      <div className="result-summary">
+        <div className="glass-card result-card" id="result-card-percentage">
+          <div className="result-card__label">{labelText}</div>
+          <div className="result-card__value result-card__value--gradient">
+            {pctStr}%
+          </div>
+          <div className="result-card__subtitle">{desc}</div>
         </div>
-        <div className="result-card__subtitle">{desc}</div>
+
+        <div className="glass-card result-card" id="result-card-population">
+          <div className="result-card__label">預估符合人數</div>
+          <div className="result-card__value result-card__value--gold">
+            {popStr}
+          </div>
+          <div className="result-card__subtitle">人（全台預估人數）</div>
+        </div>
+
+        <div className="glass-card result-card" id="result-card-ratio">
+          <div className="result-card__label">稀有度</div>
+          <div className="result-card__value result-card__value--red">
+            {ratio}
+          </div>
+          <div className="result-card__subtitle">機率指標</div>
+        </div>
       </div>
 
-      <div className="glass-card result-card" id="result-card-population">
-        <div className="result-card__label">預估符合人數</div>
-        <div className="result-card__value result-card__value--gold">
-          {popStr}
-        </div>
-        <div className="result-card__subtitle">人（全台預估人數）</div>
-      </div>
-
-      <div className="glass-card result-card" id="result-card-ratio">
-        <div className="result-card__label">稀有度</div>
-        <div className="result-card__value result-card__value--red">
-          {ratio}
-        </div>
-        <div className="result-card__subtitle">機率指標</div>
+      <div className="result-summary-note">
+        體重條件已納入身高相關性，現以 `P(體重 | 身高, 年齡, 性別)` 估算，不再把身高與體重視為獨立條件。
       </div>
     </div>
   );

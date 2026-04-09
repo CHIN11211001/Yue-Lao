@@ -10,8 +10,13 @@ export {
   REGION_DISTRIBUTION,
 } from './demographics';
 
-export { HEIGHT_DISTRIBUTION } from './physique';
-export { WEIGHT_DISTRIBUTION } from './weight';
+export {
+  HEIGHT_DISTRIBUTION,
+  WEIGHT_DISTRIBUTION,
+  HEIGHT_BY_AGE_CPT,
+  BMI_BY_AGE_STATS,
+  WEIGHT_GIVEN_HEIGHT_AGE_CPT,
+} from './body_metrics';
 export { EDUCATION_DISTRIBUTION } from './education';
 export { INCOME_DISTRIBUTION, INCOME_BY_AGE_EDUCATION_CPT } from './income';
 export {

@@ -13,8 +13,8 @@ import {
   GENDER_RATIO,
   AGE_DISTRIBUTION_MALE,
   AGE_DISTRIBUTION_FEMALE,
-  HEIGHT_DISTRIBUTION,
-  WEIGHT_DISTRIBUTION,
+  HEIGHT_BY_AGE_CPT,
+  WEIGHT_GIVEN_HEIGHT_AGE_CPT,
   EDUCATION_DISTRIBUTION,
   INCOME_BY_AGE_EDUCATION_CPT,
   AGE_MARRIAGE_DISTRIBUTION,
@@ -28,6 +28,7 @@ import {
 import {
   sumSelectedProbability,
   calculateJointProbability,
+  calculateChainedConditionalProbabilities,
   calculateWeightedConditionalProbability,
   calculateWeightedConditionalProbability2D,
   getConditionalDistribution,
@@ -57,11 +58,28 @@ export function calculateAnalysis(criteria: FilterCriteria): AnalysisResult {
   );
   const ageProbCond = sumSelectedProbability<AgeRange>(ageDistributionCond, criteria.ageRanges);
 
-  // 3. 身高比例
-  const heightProb = sumSelectedProbability(HEIGHT_DISTRIBUTION[gender], criteria.heightRanges);
-
-  // 4. 體重比例
-  const weightProb = sumSelectedProbability(WEIGHT_DISTRIBUTION[gender], criteria.weightRanges);
+  // 3-4. 身高 / 體重比例
+  // 以年齡作為上游條件，先估 P(身高 | 年齡, 性別)，再估 P(體重 | 身高, 年齡, 性別)
+  const physiqueMarginal = calculateChainedConditionalProbabilities(
+    ageDistribution,
+    HEIGHT_BY_AGE_CPT[gender],
+    WEIGHT_GIVEN_HEIGHT_AGE_CPT[gender],
+    criteria.ageRanges,
+    criteria.heightRanges,
+    criteria.weightRanges
+  );
+  const physiqueCond = calculateChainedConditionalProbabilities(
+    ageDistributionCond,
+    HEIGHT_BY_AGE_CPT[gender],
+    WEIGHT_GIVEN_HEIGHT_AGE_CPT[gender],
+    criteria.ageRanges,
+    criteria.heightRanges,
+    criteria.weightRanges
+  );
+  const heightProb = physiqueCond.secondaryProbability;
+  const weightProb = physiqueCond.targetProbability;
+  const heightProbMarginal = physiqueMarginal.secondaryProbability;
+  const weightProbMarginal = physiqueMarginal.targetProbability;
 
   // 5. 學歷比例
   // 目前把 age / education 視為上游條件，後續收入與產業會以此作為 CPT 的 conditioning。
@@ -144,7 +162,7 @@ export function calculateAnalysis(criteria: FilterCriteria): AnalysisResult {
   
   // 真實實體人口縮減計算 (物理聯合機率)
   const allMarginalProbs = [
-    ageProbMarginal, heightProb, weightProb, eduProbMarginal, incomeProbMarginal,
+    ageProbMarginal, heightProbMarginal, weightProbMarginal, eduProbMarginal, incomeProbMarginal,
     industryProbMarginal, marriageProbMarginal, regionProb, zodiacProb, mbtiProb,
   ];
   const physicalPercentage = calculateJointProbability(allMarginalProbs);
@@ -169,8 +187,8 @@ export function calculateAnalysis(criteria: FilterCriteria): AnalysisResult {
 
   const steps = [
     { label: '年齡條件', probCond: ageProbCond, probMarginal: ageProbMarginal },
-    { label: '身高條件', probCond: heightProb, probMarginal: heightProb },
-    { label: '體重條件', probCond: weightProb, probMarginal: weightProb },
+    { label: '身高條件', probCond: heightProb, probMarginal: heightProbMarginal },
+    { label: '體重條件', probCond: weightProb, probMarginal: weightProbMarginal },
     { label: '學歷條件', probCond: eduProbCond, probMarginal: eduProbMarginal },
     { label: '收入條件', probCond: incomeProbCond, probMarginal: incomeProbMarginal },
     { label: '產業職業', probCond: industryProbCond, probMarginal: industryProbMarginal },
